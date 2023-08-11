@@ -1,4 +1,4 @@
-package nl.johnny.movemate
+package nl.johnny.movemate.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -21,8 +21,9 @@ import androidx.work.workDataOf
 import nl.johnny.movemate.ui.theme.MoveMateTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import nl.johnny.movemate.ApiWorker
 
-class MainActivity : ComponentActivity() {
+class TestActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
                         workManager
                             .getWorkInfoByIdLiveData(apiRequest.id)
-                            .observe(this@MainActivity) { info ->
+                            .observe(this@TestActivity) { info ->
                                 info?.let {
                                     when (it.state) {
                                         WorkInfo.State.SUCCEEDED -> {

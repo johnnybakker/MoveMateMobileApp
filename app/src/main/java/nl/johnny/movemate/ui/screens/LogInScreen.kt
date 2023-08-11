@@ -1,4 +1,4 @@
-package nl.johnny.movemate.ui
+package nl.johnny.movemate.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,12 +16,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import nl.johnny.movemate.ui.components.ButtonStyle
 import nl.johnny.movemate.ui.components.TextButton
 import nl.johnny.movemate.ui.components.TextDivider
 import nl.johnny.movemate.ui.components.TextField
+import nl.johnny.movemate.ui.models.LogInViewModel
 
 @Composable
-fun LogInScreen(loginViewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSignUp: () -> Unit) {
+fun LogInScreen(viewModel: LogInViewModel, onClickLogIn: () -> Unit, onClickSignUp: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,17 +36,42 @@ fun LogInScreen(loginViewModel: LoginViewModel, onClickLogIn: () -> Unit, onClic
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.Center
         ) {
+
             Text(text = "Welcome", fontSize = 30.sp)
             Spacer(modifier = Modifier.height(5.dp))
-            TextField(loginViewModel.email, { loginViewModel.email = it }, "Email")
+            TextField(
+                value = viewModel.email,
+                onValueChange = { viewModel.email = it },
+                placeholder = "Email"
+            )
             Spacer(modifier = Modifier.height(5.dp))
-            TextField(loginViewModel.password, { loginViewModel.password = it }, "Password", true)
+            TextField(
+                value = viewModel.password,
+                onValueChange = { viewModel.password = it },
+                placeholder = "Password",
+                secret = true
+            )
             Spacer(modifier = Modifier.height(5.dp))
 
-            TextButton("Log in", onClickLogIn, Modifier.fillMaxWidth())
-            TextDivider("or", height = 30.dp, color = Color.LightGray)
-            TextButton("Sign up", onClickSignUp, Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(200.dp))
+            TextButton(
+                text = "Log in",
+                onClick = onClickLogIn,
+                style = ButtonStyle.Primary,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            TextDivider(
+                text = "or",
+                height = 100.dp,
+                color = Color.LightGray
+            )
+
+            TextButton(
+                text = "Sign up",
+                onClick = onClickSignUp,
+                style = ButtonStyle.PrimaryOutline,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -52,6 +79,6 @@ fun LogInScreen(loginViewModel: LoginViewModel, onClickLogIn: () -> Unit, onClic
 @Preview(name = "Log in", showBackground = true)
 @Composable
 private fun LogInScreenPreview() {
-    val loginModel = viewModel<LoginViewModel>()
+    val loginModel = viewModel<LogInViewModel>()
     LogInScreen(loginModel, {}, {})
 }

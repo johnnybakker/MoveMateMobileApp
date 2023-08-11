@@ -1,4 +1,8 @@
 package nl.johnny.movemate
 
-class ApiRequest {
+class ApiRequest(private val path: String) {
+
+
+
+
 }
