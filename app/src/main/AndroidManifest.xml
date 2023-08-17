@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
+        android:name=".MoveMateApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,6 +17,8 @@
         android:theme="@style/Theme.MoveMate"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <service android:name=".api.ApiService" android:enabled="true" />
 
         <activity
             android:name=".ui.LogInActivity"
@@ -31,11 +35,6 @@
             android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MoveMate">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
