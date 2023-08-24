@@ -1,10 +1,13 @@
 package nl.johnny.movemate.repositories
 
-interface IUserRepository {
-    fun isLoggedIn() : Boolean
+import nl.johnny.movemate.api.models.CurrentUser
+import nl.johnny.movemate.api.models.User
 
-    fun logOut()
-    fun logIn(email: String, password: String, onSuccess: () -> Unit)
-    fun signUp(username: String, email: String, password: String, onSuccess: () -> Unit)
-    fun getAll(cb: (String) -> Unit)
+interface IUserRepository {
+    fun get(onSuccess: (CurrentUser) -> Unit, onFailure: () -> Unit)
+    fun logout()
+    fun login(email: String, password: String, onSuccess: (CurrentUser) -> Unit, onFailure: () -> Unit)
+    fun signUp(username: String, email: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit)
+    fun getAll(cb: (List<User>) -> Unit)
+    fun search(value: String, cb: (List<User>) -> Unit)
 }

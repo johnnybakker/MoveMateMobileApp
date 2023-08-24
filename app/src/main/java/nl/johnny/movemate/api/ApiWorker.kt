@@ -74,10 +74,11 @@ class ApiWorker(context: Context, params: WorkerParameters)
         }
 
         if(method != RequestMethod.GET) {
-            connection.outputStream.use {
-                val data = inputData.getString(INPUT_PAYLOAD) ?: "{}"
-                it.write(data.toByteArray(Charsets.UTF_8))
-                it.flush()
+            connection.outputStream.use { stream ->
+                inputData.getString(INPUT_PAYLOAD)?.let {
+                    stream.write(it.toByteArray(Charsets.UTF_8))
+                }
+                stream.flush()
             }
         }
 

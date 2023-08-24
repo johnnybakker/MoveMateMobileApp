@@ -3,44 +3,44 @@ package nl.johnny.movemate.api.repositories;
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.WorkManager
+import com.google.firebase.messaging.FirebaseMessaging
 import nl.johnny.movemate.api.ApiRequest
+import nl.johnny.movemate.api.ApiResult
 import nl.johnny.movemate.api.ApiService
 import org.json.JSONObject
 
-abstract class ApiRepository<T>(private val owner: T, protected val service: ApiService)
-        where T : LifecycleOwner, T : Context {
+abstract class ApiRepository(context: Context, protected val service: ApiService) {
 
-    private val workManager = WorkManager.getInstance(owner.applicationContext)
+    private val workManager = WorkManager.getInstance(context.applicationContext)
+    //private val messaging = FirebaseMessaging.getInstance()
 
-    protected fun get(
+    protected fun httpGet(
         path: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
+        onSuccess: (ApiResult) -> Unit,
+        onFailure: () -> Unit
     ) : ApiRequest {
         return ApiRequest(
             workManager = workManager,
-            owner = owner,
             path = path,
             method = "GET",
-            token = service.getToken(),
+            token = service.token,
             onSuccess = onSuccess,
             onFailure = onFailure
         )
     }
 
-    protected fun post(
+    protected fun httpPost(
         path: String,
-        data: JSONObject,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
+        data: JSONObject?,
+        onSuccess: (ApiResult) -> Unit,
+        onFailure: () -> Unit
     ): ApiRequest {
         return ApiRequest(
             workManager = workManager,
-            owner = owner,
             path = path,
             method = "POST",
             data = data,
-            token = service.getToken(),
+            token = service.token,
             onSuccess = onSuccess,
             onFailure = onFailure
         )

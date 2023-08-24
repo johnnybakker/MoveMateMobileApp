@@ -1,6 +1,7 @@
 package nl.johnny.movemate.ui
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.Text
@@ -28,41 +29,41 @@ class LogInActivity : BaseActivity() {
 
         val userRepository = binder.getUserRepository(this)
 
-        if(userRepository.isLoggedIn()) {
-            return startMainActivity()
-        }
+        userRepository.get({ startMainActivity() }, {
+            setContent {
+                var screen by remember { mutableStateOf(Screen.LOGIN) }
 
-        setContent {
-            var screen by remember { mutableStateOf(Screen.LOGIN) }
-
-            MoveMateTheme {
-                when(screen) {
-                    Screen.LOGIN -> LogInScreen(
-                        viewModel = viewModel,
-                        onClickLogIn = {
-                            userRepository.logIn(
-                                email = viewModel.email,
-                                password = viewModel.password,
-                                onSuccess = { startMainActivity() }
-                            )
-                        },
-                        onClickSignUp = { screen = Screen.SIGNUP }
-                    )
-                    Screen.SIGNUP -> SignUpScreen(
-                        viewModel = viewModel,
-                        onClickSignUp = {
-                            userRepository.signUp(
-                                username = viewModel.username,
-                                password = viewModel.password,
-                                email = viewModel.email,
-                                onSuccess = { screen = Screen.LOGIN }
-                            )
-                        },
-                        onClickLogIn = { screen = Screen.LOGIN }
-                    )
+                MoveMateTheme {
+                    when(screen) {
+                        Screen.LOGIN -> LogInScreen(
+                            viewModel = viewModel,
+                            onClickLogIn = {
+                                userRepository.login(
+                                    email = viewModel.email,
+                                    password = viewModel.password,
+                                    onSuccess = { startMainActivity() },
+                                    onFailure = {  }
+                                )
+                            },
+                            onClickSignUp = { screen = Screen.SIGNUP }
+                        )
+                        Screen.SIGNUP -> SignUpScreen(
+                            viewModel = viewModel,
+                            onClickSignUp = {
+                                userRepository.signUp(
+                                    username = viewModel.username,
+                                    password = viewModel.password,
+                                    email = viewModel.email,
+                                    onSuccess = { screen = Screen.LOGIN },
+                                    onFailure = {}
+                                )
+                            },
+                            onClickLogIn = { screen = Screen.LOGIN }
+                        )
+                    }
                 }
             }
-        }
+        })
     }
 
     private fun startMainActivity() {

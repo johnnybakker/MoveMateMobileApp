@@ -2,44 +2,46 @@ package nl.johnny.movemate.api
 
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
+import org.json.JSONException
 import org.json.JSONObject
 
 class ApiRequest(
     workManager: WorkManager,
-    owner: LifecycleOwner,
     path: String,
     method: String = "GET",
-    data: JSONObject = JSONObject(),
+    data: JSONObject? = null,
     token: String? = null,
-    private val onSuccess: (String) -> Unit = {},
-    private val onFailure: (String) -> Unit = {}
+    private val onSuccess: (ApiResult) -> Unit = {},
+    private val onFailure: () -> Unit = {}
 ) {
 
     private val request: WorkRequest
+    private val liveData: LiveData<WorkInfo>
 
     init {
         request = OneTimeWorkRequestBuilder<ApiWorker>()
             .setInputData(workDataOf(
                 ApiWorker.INPUT_PATH to path,
                 ApiWorker.INPUT_METHOD to method,
-                ApiWorker.INPUT_PAYLOAD to data.toString(),
-                ApiWorker.INPUT_TOKEN to token
+                ApiWorker.INPUT_TOKEN to token,
+                ApiWorker.INPUT_PAYLOAD to data?.toString()
             ))
             .setConstraints(
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             )
             .build()
 
-        workManager
-            .getWorkInfoByIdLiveData(request.id)
-            .observe(owner, this::observer)
+        liveData = workManager.getWorkInfoByIdLiveData(request.id)
+        liveData.observeForever(this::observer)
 
         workManager.enqueue(request)
     }
@@ -49,16 +51,15 @@ class ApiRequest(
             WorkInfo.State.ENQUEUED -> {}
             WorkInfo.State.RUNNING -> {}
             WorkInfo.State.SUCCEEDED -> {
-                Log.i("API_REQUEST", "Request succeeded")
+                liveData.removeObserver(this::observer)
                 val result = info.outputData.getString(ApiWorker.OUTPUT_RESULT)
-                onSuccess(result.toString())
+                val apiResult = ApiResult.parse(result) ?: return onFailure()
+                onSuccess(apiResult)
             }
-            WorkInfo.State.FAILED -> {
-                Log.i("API_REQUEST", "Request Failed")
-                onFailure("")
+            else -> {
+                liveData.removeObserver(this::observer)
+                onFailure()
             }
-            WorkInfo.State.BLOCKED -> {}
-            WorkInfo.State.CANCELLED -> {}
         }
     }
 }

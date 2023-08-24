@@ -4,5 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 
 interface IRepositoryBinder {
-    fun <T> getUserRepository(owner: T): IUserRepository where T : LifecycleOwner, T : Context
+    fun getUserRepository(context: Context): IUserRepository
+    fun getSessionRepository(context: Context): ISessionRepository
 }
