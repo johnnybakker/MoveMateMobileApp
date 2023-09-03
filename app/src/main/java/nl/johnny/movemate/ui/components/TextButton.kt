@@ -24,10 +24,12 @@ enum class ButtonStyle {
 }
 
 @Composable
-fun TextButton(text: String, onClick: () -> Unit, style: ButtonStyle, enabled: Boolean = true, modifier: Modifier = Modifier) {
+fun TextButton(text: String, style: ButtonStyle = ButtonStyle.Primary, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
 
     val colors = when(style) {
-        ButtonStyle.Primary -> ButtonDefaults.buttonColors()
+        ButtonStyle.Primary -> ButtonDefaults.buttonColors(
+            contentColor = colorScheme.secondary
+        )
         ButtonStyle.Secondary -> ButtonDefaults.buttonColors(
             containerColor = colorScheme.secondary
         )
@@ -45,25 +47,29 @@ fun TextButton(text: String, onClick: () -> Unit, style: ButtonStyle, enabled: B
         border = border,
         enabled = enabled
     ) {
-        Text(text)
+        Text(text = text, color = when(style) {
+            ButtonStyle.Primary -> colorScheme.secondary
+            ButtonStyle.PrimaryOutline -> colorScheme.primary
+            ButtonStyle.Secondary -> colorScheme.primary
+        })
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PrimaryTextButtonPreview() {
-    TextButton("Primary", {}, ButtonStyle.Primary)
+    TextButton(text = "Primary", style = ButtonStyle.Primary)
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PrimaryOutlineTextButtonPreview() {
-    TextButton("Primary", {}, ButtonStyle.PrimaryOutline)
+    TextButton("Primary", ButtonStyle.PrimaryOutline)
 }
 
 
 @Preview(showBackground = true)
 @Composable
 private fun SecondaryTextButtonPreview() {
-    TextButton("Secondary", {}, ButtonStyle.Secondary)
+    TextButton("Secondary", ButtonStyle.Secondary)
 }

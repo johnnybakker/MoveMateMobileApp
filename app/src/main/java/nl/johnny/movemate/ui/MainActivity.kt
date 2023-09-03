@@ -5,32 +5,30 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
+import nl.johnny.movemate.MoveMateApp
 import nl.johnny.movemate.R
-import nl.johnny.movemate.api.models.User
-import nl.johnny.movemate.api.repositories.SessionRepository
-import nl.johnny.movemate.repositories.IRepositoryBinder
+import nl.johnny.movemate.api.models.Workout
+import nl.johnny.movemate.ui.components.TextButton
 import nl.johnny.movemate.ui.theme.MoveMateTheme
-import nl.johnny.movemate.ui.components.TextField
 
-class MainActivity : BaseActivity() {
+class MainActivity : MoveMateActivity() {
 
     // Declare the launcher at the top of your Activity/Fragment:
     private val requestPermissionLauncher = registerForActivityResult(
@@ -67,93 +65,72 @@ class MainActivity : BaseActivity() {
         val notification = NotificationCompat.Builder(applicationContext, getString(R.string.default_notification_channel_id))
             .setContentText("This is som content text")
             .setContentTitle("Hello, world!")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .build()
         notificationManager.notify(1, notification)
     }
 
-    override fun onRepositoryBinder(binder: IRepositoryBinder) {
-
-        val userRepository = binder.getUserRepository(this)
-        val sessionRepository = binder.getSessionRepository(this)
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) return@OnCompleteListener
-            sessionRepository.setFirebaseToken(task.result)
-        })
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         setContent {
-            val context = LocalContext.current
+            MoveMateTheme(menuItems = menuItems) {
 
-            var hasNotificationPermission by remember {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    mutableStateOf(
-                        ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            ) == PackageManager.PERMISSION_GRANTED
-                    )
-                } else {
-                    mutableStateOf(true)
-                }
-            }
+                var workout by remember { mutableStateOf<Workout?>(null) }
 
-            val permissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission(),
-                onResult = {
-                    hasNotificationPermission = it
-                    if(!it) {
-                        shouldShowRequestPermissionRationale("This is needed!")
-                    }
-                }
-            )
+                Column(verticalArrangement = Arrangement.Top) {
 
-            if(!hasNotificationPermission) {
-                Log.d("MAIN_ACTIVITY", "No permission")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            }
 
-            val users = remember { mutableStateListOf<User>() }
-            var searchUsername by remember { mutableStateOf("") }
+                    if (workout == null) {
 
-            MoveMateTheme {
-                Column {
-                    TextField(searchUsername, { username ->
-                        searchUsername = username
-                        if(searchUsername.isNotEmpty()) {
-                            userRepository.search(searchUsername) {
-                                users.clear()
-                                users.addAll(it)
+
+                        TextButton( text = "Start ${app.currentUser?.username}") {
+                            app.workoutRepository.create("RUNNING") {
+                                workout = it
                             }
-                        } else {
-                            users.clear()
                         }
-                    }, placeholder = "Search")
 
-                    Column {
-                        users.forEach { user ->
-                            Text(user.username)
-                        }
-                    }
 
-                    Button(onClick = {
-                        userRepository.logout()
-                        finish()
-                    }) {
-                        Text(text = "Logout")
-                    }
-                    Button(onClick = {
-                        if (hasNotificationPermission) {
-                            showNotification()
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+
+                    } else {
+                        TextButton(text = "Stop ${app.currentUser?.username}") {
+                            workout = null
                         }
-                    }) {
-                        Text(text = "notification")
                     }
                 }
+
+            /*
+                val context = LocalContext.current
+
+                var hasNotificationPermission by remember {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        mutableStateOf(
+                            ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                ) == PackageManager.PERMISSION_GRANTED
+                        )
+                    } else {
+                        mutableStateOf(true)
+                    }
+                }
+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = {
+                        hasNotificationPermission = it
+                        if(!it) {
+                            shouldShowRequestPermissionRationale("This is needed!")
+                        }
+                    }
+                )
+
+                if(!hasNotificationPermission) {
+                    Log.d("MAIN_ACTIVITY", "No permission")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }*/
             }
         }
     }

@@ -6,6 +6,6 @@ import androidx.compose.runtime.setValue
 import kotlinx.serialization.Serializable
 
 @Serializable
-class SignUpViewModel : LogInViewModel() {
+class SignUpViewModel : LoginViewModel() {
     var username by mutableStateOf("")
 }

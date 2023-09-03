@@ -1,37 +1,78 @@
 package nl.johnny.movemate.api.repositories
 
-import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
-import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
-import nl.johnny.movemate.api.ApiRequest
+import nl.johnny.movemate.MoveMateApp
 import nl.johnny.movemate.api.ApiResultType
-import nl.johnny.movemate.api.ApiService
 import nl.johnny.movemate.api.models.CurrentUser
 import nl.johnny.movemate.api.models.User
 import nl.johnny.movemate.repositories.IUserRepository
 import org.json.JSONObject
 import java.lang.Exception
 
-class UserRepository(context: Context, service: ApiService) : ApiRepository(context, service), IUserRepository {
+class UserRepository(app: MoveMateApp) : ApiRepository(app), IUserRepository {
 
     companion object {
         const val TAG = "USER_REPO"
         val GSON = Gson()
     }
 
+    override fun subscribe(id: Int, callback: (Boolean) -> Unit) {
+        httpPost(
+            path = "/user/${app.userId}/subscribe",
+            data = JSONObject(
+                mapOf("id" to id)
+            ),
+            onFailure = { callback(false) },
+            onSuccess = { callback(true) }
+        )
+    }
+
+    override fun unsubscribe(id: Int, callback: (Boolean) -> Unit) {
+        httpPost(
+            path = "/user/${app.userId}/unsubscribe",
+            data = JSONObject(
+                mapOf("id" to id)
+            ),
+            onFailure = { callback(false) },
+            onSuccess = { callback(true) }
+        )
+    }
+
+    override fun getSubscribers(onSuccess: (subscribers: List<Int>)-> Unit, onFailure: () -> Unit) {
+        httpGet("/user/${app.userId}/subscribers", {
+            try {
+                val typeToken = object : TypeToken<List<Int>>() {}.type
+                onSuccess(GSON.fromJson(it.data, typeToken))
+            } catch (e: Exception) {
+                onFailure()
+            }
+        }, onFailure)
+    }
+
+    override fun getSubscriptions(
+        onSuccess: (subscriptions: List<Int>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        httpGet("/user/${app.userId}/subscriptions", {
+            try {
+                val typeToken = object : TypeToken<List<Int>>() {}.type
+                onSuccess(GSON.fromJson(it.data, typeToken))
+            } catch (e: Exception) {
+                onFailure()
+            }
+        }, onFailure)
+    }
+
     override fun get(onSuccess: (CurrentUser) -> Unit, onFailure: () -> Unit) {
-        Log.d(TAG, "Getting user ${service.userId}, ${service.token}")
-        service.currentUser?.let { return onSuccess(it) }
+        app.currentUser?.let { return onSuccess(it) }
 
-
-        if(service.userId == -1 || service.token == null)
+        if(app.userId == -1 || app.token == null)
             return onFailure()
 
-        httpGet("/user/${service.userId}", {
+        httpGet("/user/${app.userId}", {
             try {
                 onSuccess(GSON.fromJson(it.data, CurrentUser::class.java))
             } catch (e: Exception) {
@@ -41,11 +82,11 @@ class UserRepository(context: Context, service: ApiService) : ApiRepository(cont
     }
 
     override fun logout() {
-        service.currentUser = null
+        app.currentUser = null
     }
 
     override fun login(email: String, password: String, onSuccess: (CurrentUser) -> Unit, onFailure: () -> Unit) {
-        service.currentUser?.let { return onSuccess(it) }
+        app.currentUser?.let { return onSuccess(it) }
 
         httpPost(
             path = "/user/login",
@@ -56,17 +97,17 @@ class UserRepository(context: Context, service: ApiService) : ApiRepository(cont
                 when(it.type) {
                     ApiResultType.Success -> {
                         val currentUser = GSON.fromJson(it.data, CurrentUser::class.java)
-                        service.currentUser = currentUser
+                        app.currentUser = currentUser
                         onSuccess(currentUser)
                     }
                     ApiResultType.Failed -> {
-                        service.currentUser = null
+                        app.currentUser = null
                         onFailure()
                     }
                 }
             },
             onFailure = {
-                service.currentUser = null
+                app.currentUser = null
                 onFailure()
             }
         )
