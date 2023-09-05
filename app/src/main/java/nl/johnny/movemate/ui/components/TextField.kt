@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,8 +34,8 @@ fun TextField(value: String, onValueChange: (String) -> Unit, modifier: Modifier
     val style = TextStyle(
         fontSize = typography.bodyLarge.fontSize,
         color = when(value.isEmpty()) {
-            false -> Color.Black
-            true -> Color.LightGray
+            false -> colorScheme.tertiary
+            true -> colorScheme.inverseSurface
         },
         textDecoration = TextDecoration.None
 
@@ -47,7 +48,7 @@ fun TextField(value: String, onValueChange: (String) -> Unit, modifier: Modifier
         modifier = modifier.border(
             width = 2.dp,
             color = when(valid) {
-                true -> Color.LightGray
+                true -> colorScheme.inverseSurface
                 false -> Color.Red
             },
             shape = RoundedCornerShape(size = 5.dp)

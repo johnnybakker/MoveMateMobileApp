@@ -1,5 +1,6 @@
 package nl.johnny.movemate.api.repositories
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import nl.johnny.movemate.MoveMateApp
@@ -26,6 +27,7 @@ class WorkoutRepository(app: MoveMateApp) : ApiRepository(app), IWorkoutReposito
             ),
             onSuccess = {
                 try {
+                    Log.d(TAG, it.data.toString())
                     cb(GSON.fromJson(it.data, Workout::class.java))
                 } catch (e: Exception) {
                     cb(null)

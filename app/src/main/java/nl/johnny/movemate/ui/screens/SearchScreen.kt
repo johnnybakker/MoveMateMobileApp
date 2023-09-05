@@ -51,8 +51,7 @@ fun <T> SearchScreen(
                 searchValue = it
                 search(searchValue)
             },
-            placeholder = "Search",
-            modifier = Modifier.background(Color.White)
+            placeholder = "Search"
         )
 
         Column(

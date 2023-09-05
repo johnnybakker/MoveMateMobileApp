@@ -19,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +31,7 @@ import nl.johnny.movemate.ui.components.TextButton
 import nl.johnny.movemate.ui.components.TextDivider
 import nl.johnny.movemate.ui.components.TextField
 import nl.johnny.movemate.ui.models.SignUpViewModel
+import nl.johnny.movemate.ui.theme.MoveMateTheme
 
 @Composable
 fun SignUpScreen(
@@ -56,7 +59,7 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Text(text = "Sign up", fontSize = 30.sp)
+            Text(text = "SIGN UP", fontSize = 30.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(5.dp))
 
@@ -202,9 +205,13 @@ private object StrongPasswordValidator {
     )
 }
 
-@Preview(name = "Sign Up", showBackground = true)
+@Preview(name = "SIGN UP", showBackground = true)
 @Composable
 private fun SignUpScreenPreview() {
-    val loginModel = viewModel<SignUpViewModel>()
-    SignUpScreen(loginModel, {}, {})
+    MoveMateTheme() {
+
+
+        val loginModel = viewModel<SignUpViewModel>()
+        SignUpScreen(loginModel, {}, {})
+    }
 }

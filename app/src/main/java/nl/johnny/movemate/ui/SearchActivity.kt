@@ -44,28 +44,41 @@ class SearchActivity : MoveMateActivity() {
                         unsubscribe = { unsubscribe(user) }
                     )
                 }
+
+
+
             }
+            search("")
         }
     }
 
+
     private fun subscribe(user: User) {
         app.userRepository.subscribe(user.id){
-
-            user.subscribers.add(app.userId);
+            user.subscribers.add(app.userId)
+            search(value.value)
         }
     }
 
     private fun unsubscribe(user: User) {
         app.userRepository.unsubscribe(user.id){
             user.subscribers.remove(app.userId)
+            search(value.value)
         }
     }
 
     private fun search(v: String) {
         value.value = v
-        app.userRepository.search(v) {
-            users.clear()
-            users.addAll(it)
+        if(v.isEmpty()) {
+            app.userRepository.getAll {
+                users.clear()
+                users.addAll(it)
+            }
+        } else {
+            app.userRepository.search(v) {
+                users.clear()
+                users.addAll(it)
+            }
         }
     }
 

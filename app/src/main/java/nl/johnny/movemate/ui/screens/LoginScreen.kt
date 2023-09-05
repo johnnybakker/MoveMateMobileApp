@@ -9,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +30,7 @@ fun LoginScreen(viewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSign
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = "Welcome", fontSize = 30.sp)
+        Text(text = "WELCOME", fontSize = 30.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(5.dp))
         TextField(
             value = viewModel.email,

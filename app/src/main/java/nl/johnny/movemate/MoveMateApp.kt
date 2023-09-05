@@ -79,14 +79,21 @@ class MoveMateApp : Application(), OnCompleteListener<String> {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val userChannel = NotificationChannel(
                  getString(R.string.default_notification_channel_id),
-                "Default notification",
+                "Subscriber notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+            val workoutChannel = NotificationChannel(
+                getString(R.string.workout_notification_channel_id),
+                "Workout notifications",
                 NotificationManager.IMPORTANCE_HIGH
             )
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(userChannel)
+            notificationManager.createNotificationChannel(workoutChannel)
         }
 
         // Get token
@@ -107,5 +114,7 @@ class MoveMateApp : Application(), OnCompleteListener<String> {
         const val TAG = "APP"
         const val APP_USER_ID = "APP_USER_ID"
         const val APP_USER_TOKEN = "APP_USER_TOKEN"
+        const val USER_NOTIFICATION = 1
+        const val WORKOUT_NOTIFICATION = 2
     }
 }

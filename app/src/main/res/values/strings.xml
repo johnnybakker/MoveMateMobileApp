@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MoveMate</string>
     <string name="default_notification_channel_id">default_notification</string>
+    <string name="workout_notification_channel_id">workout_notification</string>
 </resources>

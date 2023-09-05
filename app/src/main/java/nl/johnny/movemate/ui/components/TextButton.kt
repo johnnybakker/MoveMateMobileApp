@@ -48,9 +48,9 @@ fun TextButton(text: String, style: ButtonStyle = ButtonStyle.Primary, enabled: 
         enabled = enabled
     ) {
         Text(text = text, color = when(style) {
-            ButtonStyle.Primary -> colorScheme.secondary
+            ButtonStyle.Primary -> colorScheme.background
             ButtonStyle.PrimaryOutline -> colorScheme.primary
-            ButtonStyle.Secondary -> colorScheme.primary
+            ButtonStyle.Secondary -> colorScheme.background
         })
     }
 }

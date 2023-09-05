@@ -42,6 +42,6 @@ class PushNotificationService : FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.ic_launcher_round)
             .build()
 
-        notificationManager.notify(1, notification)
+        notificationManager.notify(MoveMateApp.USER_NOTIFICATION, notification)
     }
 }

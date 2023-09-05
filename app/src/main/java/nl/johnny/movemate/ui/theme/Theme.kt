@@ -35,19 +35,21 @@ import nl.johnny.movemate.ui.components.MenuItem
 import nl.johnny.movemate.ui.components.TopBar
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Orange,
-    secondary = Blue,
+    primary = Blue,
+    secondary = DarkGray,
     tertiary = White,
-    background = Black,
-    surface = Color.Transparent
+    background = Dark,
+    surface = Dark,
+    inverseSurface = Light
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Blue,
-    secondary = White,
-    tertiary = White,
+    secondary = DarkGray,
+    tertiary = Dark,
     background = White,
-    surface = Color.Transparent
+    surface = White,
+    inverseSurface = DarkGray
 )
 
 @Composable
@@ -83,7 +85,7 @@ fun MoveMateTheme(
                     .background(colorScheme.background)
             ) {
                 val title = stringResource(R.string.app_name)
-                val icon = painterResource(id = R.mipmap.ic_launcher_square_adaptive_fore)
+                val icon = painterResource(id = R.mipmap.ic_launcher_round_adaptive_fore)
 
                 TopBar(title, icon)
                 Surface(
