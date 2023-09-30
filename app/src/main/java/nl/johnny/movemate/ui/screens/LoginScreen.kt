@@ -21,6 +21,7 @@ import nl.johnny.movemate.ui.components.TextDivider
 import nl.johnny.movemate.ui.components.TextField
 import nl.johnny.movemate.ui.models.LoginViewModel
 import nl.johnny.movemate.ui.theme.MoveMateTheme
+import nl.johnny.movemate.ui.theme.MoveMateTheme.alertText
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSignUp: () -> Unit) {

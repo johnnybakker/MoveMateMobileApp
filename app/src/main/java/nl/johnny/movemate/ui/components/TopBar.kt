@@ -40,7 +40,7 @@ import java.util.Locale
 
 
 @Composable
-fun TopBar(title: String, icon: Painter) {
+fun TopBar(title: String) {
 
 
     Box(

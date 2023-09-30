@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -84,9 +85,7 @@ fun SignUpScreen(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
                 placeholder = "Password",
-                secret = true,
-                valid = viewModel.password.isEmpty() || result.valid(),
-
+                secret = true
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -98,9 +97,9 @@ fun SignUpScreen(
 
                 color = when(result.level()){
                     StrongPasswordValidator.Level.None -> Color.LightGray
-                    StrongPasswordValidator.Level.Strong -> Color.Green
-                    StrongPasswordValidator.Level.Weak -> Color.Red
-                    StrongPasswordValidator.Level.Medium -> Color.Yellow
+                    StrongPasswordValidator.Level.Strong -> nl.johnny.movemate.ui.theme.Success
+                    StrongPasswordValidator.Level.Weak -> nl.johnny.movemate.ui.theme.Danger
+                    StrongPasswordValidator.Level.Medium -> nl.johnny.movemate.ui.theme.Warning
                 }
             )
 
@@ -118,8 +117,7 @@ fun SignUpScreen(
                 value = repeatPassword,
                 onValueChange = { repeatPassword = it },
                 placeholder = "Repeat password",
-                secret = true,
-                valid = passwordsDoMatch
+                secret = true
             )
 
             Spacer(modifier = Modifier.height(5.dp))

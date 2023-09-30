@@ -1,27 +1,36 @@
 package nl.johnny.movemate.ui
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import nl.johnny.movemate.WorkoutService
+import nl.johnny.movemate.WorkoutTrackingData
 import nl.johnny.movemate.api.models.Workout
 import nl.johnny.movemate.ui.screens.WorkoutScreen
 import nl.johnny.movemate.ui.theme.MoveMateTheme
 import nl.johnny.movemate.utils.TimeUtil
-import java.sql.Time
-import java.time.Instant
-import java.time.LocalDateTime
-import java.util.Calendar
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.math.floor
+import kotlin.math.round
 
 class MainActivity : MoveMateActivity(), ServiceConnection {
     companion object {
@@ -29,81 +38,49 @@ class MainActivity : MoveMateActivity(), ServiceConnection {
 
     }
 
-//    // Declare the launcher at the top of your Activity/Fragment:
-//    private val requestPermissionLauncher = registerForActivityResult(
-//        ActivityResultContracts.RequestPermission(),
-//    ) { isGranted: Boolean ->
-//        if (isGranted) {
-//            // FCM SDK (and your app) can post notifications.
-//        } else {
-//            // TODO: Inform user that that your app will not show notifications.
-//        }
-//    }
-//
-//    private fun askNotificationPermission() {
-//        // This is only necessary for API level >= 33 (TIRAMISU)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-//                PackageManager.PERMISSION_GRANTED
-//            ) {
-//                // FCM SDK (and your app) can post notifications.
-//            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-//                // TODO: display an educational UI explaining to the user the features that will be enabled
-//                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-//                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-//                //       If the user selects "No thanks," allow the user to continue without notifications.
-//            } else {
-//                // Directly ask for the permission
-//                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-//            }
-//        }
-//    }
-
     private var workoutService: WorkoutService? = null
+
+    @Composable
+    fun LocationPermissionRequest(permission: String, onPermissionGranted: () -> Unit) {
+        val context = LocalContext.current
+
+        val permissionState = rememberUpdatedState(
+            checkLocationPermissionState(context, permission)
+        )
+
+        if (permissionState.value) {
+            onPermissionGranted()
+        } else {
+            RequestLocationPermission(permission)
+        }
+    }
+
+    @Composable
+    private fun RequestLocationPermission(permission: String) {
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = {}
+        )
+
+        permissionLauncher.launch(permission)
+    }
+
+    @Composable
+    fun checkLocationPermissionState(context: Context, permission: String): Boolean =
+        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Intent(this, WorkoutService::class.java).also { intent ->
-            bindService(intent, this, Context.BIND_AUTO_CREATE)
-        }
 
         setContent {
             MoveMateTheme(menuItems = menuItems) {
 
 
-            /*
-                val context = LocalContext.current
-
-                var hasNotificationPermission by remember {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        mutableStateOf(
-                            ContextCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                ) == PackageManager.PERMISSION_GRANTED
-                        )
-                    } else {
-                        mutableStateOf(true)
-                    }
+                Intent(this, WorkoutService::class.java).also { intent ->
+                    bindService(intent, this, Context.BIND_AUTO_CREATE)
                 }
 
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = {
-                        hasNotificationPermission = it
-                        if(!it) {
-                            shouldShowRequestPermissionRationale("This is needed!")
-                        }
-                    }
-                )
-
-                if(!hasNotificationPermission) {
-                    Log.d("MAIN_ACTIVITY", "No permission")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }*/
             }
         }
     }
@@ -114,25 +91,53 @@ class MainActivity : MoveMateActivity(), ServiceConnection {
 
             setContent {
                 MoveMateTheme(menuItems = menuItems) {
-                    var workout by remember { mutableStateOf<Workout?>(null) }
-                    var time by remember { mutableStateOf("00:00:00") }
+                    var trackingData by remember { mutableStateOf<WorkoutTrackingData?>(null) }
 
-                    workoutService.workout.observe(this@MainActivity) { update ->
-                        workout = update
-                        Log.d(TAG, "Updating workout")
-                        workout?.let {
-                            val elapsed = TimeUtil.elapsedMillis(it.startDate.time)
-                            time = TimeUtil.secondsToTimeString(elapsed/1000)
-                        }
-                    }
+                    workoutService.trackingData.observe(this) { trackingData = it }
 
-                    WorkoutScreen(time = time, distance = "0KM", started = workout != null) {
-                        Intent(applicationContext, workoutService.javaClass).also {
-                            it.action = when(workout == null) {
-                                true -> WorkoutService.Command.START_WORKOUT.value
-                                false -> WorkoutService.Command.STOP_WORKOUT.value
+                    val permissionLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = {
+                            Intent(applicationContext, workoutService.javaClass).also {
+                                it.action = when(trackingData == null) {
+                                    true -> WorkoutService.Command.START_WORKOUT.value
+                                    false -> WorkoutService.Command.STOP_WORKOUT.value
+                                }
+                                startService(it)
                             }
-                            startService(it)
+                        }
+                    )
+
+                    val time = (trackingData?.time ?: 0L) / 1000
+                    val distance = trackingData?.km ?: 0.0
+                    val speed = if(time > 1) { floor((distance / time) * 3.6 * 10) / 10 } else { 0.0 }
+
+                    WorkoutScreen(time = TimeUtil.secondsToTimeString(time), distance = "${floor(distance * 10) / 10} KM", "$speed KM/H", started = trackingData != null) {
+
+                        if (trackingData != null) {
+
+                            Intent(applicationContext, workoutService.javaClass).also {
+                                it.action =  WorkoutService.Command.STOP_WORKOUT.value
+                                startService(it)
+                            }
+                            trackingData = null
+
+                        } else {
+                            permissionLauncher.launch(
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    arrayOf(
+                                        Manifest.permission.POST_NOTIFICATIONS,
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+
+                                } else {
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                }
+                            )
                         }
                     }
                 }

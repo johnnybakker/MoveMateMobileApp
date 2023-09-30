@@ -46,7 +46,7 @@ fun WorkoutDataRow(iconId: Int, text: String) {
 }
 
 @Composable
-fun WorkoutScreen(time: String, distance: String, started: Boolean, toggle: () -> Unit) {
+fun WorkoutScreen(time: String, distance: String, speed: String,  started: Boolean, toggle: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         modifier = Modifier.fillMaxWidth(1f)
@@ -55,6 +55,7 @@ fun WorkoutScreen(time: String, distance: String, started: Boolean, toggle: () -
         Spacer(Modifier.height(5.dp))
         WorkoutDataRow(R.drawable.stopwatch_solid, time)
         WorkoutDataRow(R.drawable.person_running_solid, distance)
+        WorkoutDataRow(R.mipmap.logo_no_spacing_foreground, speed)
         Spacer(Modifier.height(20.dp))
         when(started) {
             true -> IconButton (
@@ -85,8 +86,8 @@ fun WorkoutScreen(time: String, distance: String, started: Boolean, toggle: () -
 fun WorkoutScreenPreview() {
     MoveMateTheme {
         Column {
-            WorkoutScreen("00:00:00", "0.0KM", false, {})
-            WorkoutScreen("01:23:45", "23.4KM", true, {})
+            WorkoutScreen("00:00:00", "0.0 KM", "0.0 KM/H",false, {})
+            WorkoutScreen("01:23:45", "23.4 KM", "5.9 KM/H", true, {})
         }
     }
 }

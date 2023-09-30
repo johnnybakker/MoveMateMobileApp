@@ -13,6 +13,7 @@ import nl.johnny.movemate.ui.models.SignUpViewModel
 import nl.johnny.movemate.ui.screens.LoginScreen
 import nl.johnny.movemate.ui.theme.MoveMateTheme
 import nl.johnny.movemate.ui.screens.SignUpScreen
+import nl.johnny.movemate.ui.theme.MoveMateTheme.alertText
 
 class LoginActivity : MoveMateActivity() {
 
@@ -44,7 +45,9 @@ class LoginActivity : MoveMateActivity() {
                                     onSuccess = {
                                         startActivity<MainActivity>()
                                     },
-                                    onFailure = {  }
+                                    onFailure = {
+                                        alertText = "Wrong email or password combination"
+                                    }
                                 )
                             },
                             onClickSignUp = { screen = Screen.SIGNUP }
@@ -57,7 +60,9 @@ class LoginActivity : MoveMateActivity() {
                                     password = viewModel.password,
                                     email = viewModel.email,
                                     onSuccess = { screen = Screen.LOGIN },
-                                    onFailure = {}
+                                    onFailure = {
+                                        alertText = "Failed to sign up using the information below"
+                                    }
                                 )
                             },
                             onClickLogIn = { screen = Screen.LOGIN }

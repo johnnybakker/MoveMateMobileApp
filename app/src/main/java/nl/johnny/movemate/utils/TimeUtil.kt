@@ -16,7 +16,7 @@ class TimeUtil {
         }
 
         fun elapsedMillis(s: Long?): Long {
-            return Calendar.getInstance().timeInMillis - (s ?: 0)
+            return System.currentTimeMillis() - (s ?: 0)
         }
     }
 

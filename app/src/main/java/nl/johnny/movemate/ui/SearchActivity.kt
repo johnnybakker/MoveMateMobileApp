@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import nl.johnny.movemate.ui.theme.MoveMateTheme.alertSuccess
 
 
 class SearchActivity : MoveMateActivity() {
@@ -57,6 +58,7 @@ class SearchActivity : MoveMateActivity() {
         app.userRepository.subscribe(user.id){
             user.subscribers.add(app.userId)
             search(value.value)
+            alertSuccess("Subscribed to ${user.username}")
         }
     }
 
@@ -64,6 +66,7 @@ class SearchActivity : MoveMateActivity() {
         app.userRepository.unsubscribe(user.id){
             user.subscribers.remove(app.userId)
             search(value.value)
+            alertSuccess("Unsubscribed from ${user.username}")
         }
     }
 

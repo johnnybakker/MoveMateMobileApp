@@ -23,6 +23,7 @@ import nl.johnny.movemate.ui.LoginActivity
 import nl.johnny.movemate.ui.MainActivity
 import nl.johnny.movemate.ui.SearchActivity
 import nl.johnny.movemate.ui.components.MenuItem
+import nl.johnny.movemate.R
 import java.lang.ClassCastException
 
 class MoveMateApp : Application(), OnCompleteListener<String> {
