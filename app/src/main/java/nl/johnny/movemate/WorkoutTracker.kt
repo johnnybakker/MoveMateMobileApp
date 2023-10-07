@@ -1,19 +1,11 @@
 package nl.johnny.movemate
 
 import android.Manifest
-import android.app.Notification
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.gms.location.LocationCallback
@@ -21,9 +13,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.gson.JsonObject
 import nl.johnny.movemate.api.models.Workout
-import nl.johnny.movemate.utils.GPSUtil
 import java.util.concurrent.TimeUnit
 
 class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {

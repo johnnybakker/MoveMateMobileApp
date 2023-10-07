@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import nl.johnny.movemate.MoveMateApp
 import nl.johnny.movemate.ui.models.SignUpViewModel
 import nl.johnny.movemate.ui.screens.LoginScreen
 import nl.johnny.movemate.ui.theme.MoveMateTheme

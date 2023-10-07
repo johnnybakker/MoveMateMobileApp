@@ -28,7 +28,8 @@ import java.lang.ClassCastException
 
 class MoveMateApp : Application(), OnCompleteListener<String> {
 
-    private lateinit var preferences: SharedPreferences
+    private val preferences: SharedPreferences
+        get() = getSharedPreferences("_", Context.MODE_PRIVATE)
     lateinit var userRepository: IUserRepository
     lateinit var sessionRepository: ISessionRepository
     lateinit var workoutRepository: IWorkoutRepository
@@ -71,8 +72,6 @@ class MoveMateApp : Application(), OnCompleteListener<String> {
 
     override fun onCreate() {
         super.onCreate()
-
-        preferences = getSharedPreferences("_", Context.MODE_PRIVATE)
 
         userRepository = UserRepository(this)
         sessionRepository = SessionRepository(this)

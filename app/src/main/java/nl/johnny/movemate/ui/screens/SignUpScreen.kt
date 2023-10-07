@@ -1,8 +1,6 @@
 package nl.johnny.movemate.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,19 +17,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.tooltip.TooltipDrawable
 import nl.johnny.movemate.ui.components.ButtonStyle
 import nl.johnny.movemate.ui.components.TextButton
 import nl.johnny.movemate.ui.components.TextDivider
 import nl.johnny.movemate.ui.components.TextField
 import nl.johnny.movemate.ui.models.SignUpViewModel
+import nl.johnny.movemate.ui.theme.LightGray
 import nl.johnny.movemate.ui.theme.MoveMateTheme
+import nl.johnny.movemate.utils.StrongPasswordValidator
+
+
+object SignUpScreenTestTags {
+    val UsernameInput = "UsernameInput"
+    val EmailInput = "EmailInput"
+    val PasswordInput = "PasswordInput"
+    val PasswordIndicator = "PasswordIndicator"
+    val RepeatPasswordInput = "RepeatPasswordInput"
+    val SignUpButton = "SignUpButton"
+}
 
 @Composable
 fun SignUpScreen(
@@ -67,7 +76,9 @@ fun SignUpScreen(
             TextField(
                 value = viewModel.username,
                 onValueChange = { viewModel.username = it },
-                placeholder = "Username"
+                placeholder = "Username",
+                modifier = Modifier
+                    .testTag(SignUpScreenTestTags.UsernameInput)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -75,7 +86,9 @@ fun SignUpScreen(
             TextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                placeholder = "Email"
+                placeholder = "Email",
+                modifier = Modifier
+                    .testTag(SignUpScreenTestTags.EmailInput)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -85,7 +98,9 @@ fun SignUpScreen(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
                 placeholder = "Password",
-                secret = true
+                secret = true,
+                modifier = Modifier
+                    .testTag(SignUpScreenTestTags.PasswordInput)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -93,10 +108,11 @@ fun SignUpScreen(
             Divider(
                 Modifier
                     .fillMaxWidth()
-                    .height(8.dp),
+                    .height(8.dp)
+                    .testTag(SignUpScreenTestTags.PasswordIndicator),
 
                 color = when(result.level()){
-                    StrongPasswordValidator.Level.None -> Color.LightGray
+                    StrongPasswordValidator.Level.None -> LightGray
                     StrongPasswordValidator.Level.Strong -> nl.johnny.movemate.ui.theme.Success
                     StrongPasswordValidator.Level.Weak -> nl.johnny.movemate.ui.theme.Danger
                     StrongPasswordValidator.Level.Medium -> nl.johnny.movemate.ui.theme.Warning
@@ -117,7 +133,8 @@ fun SignUpScreen(
                 value = repeatPassword,
                 onValueChange = { repeatPassword = it },
                 placeholder = "Repeat password",
-                secret = true
+                secret = true,
+                modifier = Modifier.testTag(SignUpScreenTestTags.RepeatPasswordInput)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -133,6 +150,7 @@ fun SignUpScreen(
                     passwordsDoMatch &&
                     result.valid(),
                 modifier = Modifier.fillMaxWidth()
+                    .testTag(SignUpScreenTestTags.SignUpButton)
             )
 
             TextDivider(
@@ -149,58 +167,6 @@ fun SignUpScreen(
             )
         }
     }
-}
-
-private object StrongPasswordValidator {
-    enum class Level {
-        None,
-        Weak,
-        Medium,
-        Strong
-    }
-
-    class ValidationResult(
-        val containsThreeLowerCaseCharacters: Boolean,
-        val containsOneUpperCaseCharacter: Boolean,
-        val containsOneNumber: Boolean,
-        val containsOneSpecialCharacter: Boolean,
-        val containsEightOrMoreCharacters: Boolean
-    ) {
-
-        fun level() : Level {
-            var trueCount = 0
-            if(containsThreeLowerCaseCharacters) trueCount++
-            if(containsOneUpperCaseCharacter) trueCount++
-            if(containsOneNumber) trueCount++
-            if(containsOneSpecialCharacter) trueCount++
-            if(containsEightOrMoreCharacters) trueCount++
-
-            val level = when(trueCount) {
-                5 -> Level.Strong
-                4,3 -> Level.Medium
-                2,1 -> Level.Weak
-                else -> Level.None
-            }
-
-            return level
-        }
-
-        fun valid() : Boolean = level() == Level.Strong
-    }
-
-    private val containsThreeLowerCaseCharactersRegex: Regex = Regex("^(?=(.*[a-z]){3,}).*\$")
-    private val containsOneUpperCaseCharacterRegex = Regex("^(?=(.*[A-Z])+).*\$")
-    private val containsOneNumberRegex = Regex("^(?=(.*[0-9])+).*\$")
-    private val containsOneSpecialCharacterRegex = Regex("^(?=(.*[!@#\$%^&*()\\-__+.])+).*\$")
-    private val containsEightOrMoreCharactersRegex = Regex("^.{8,}\$")
-
-    fun validate(password: String) = ValidationResult(
-        containsThreeLowerCaseCharactersRegex.matches(password),
-        containsOneUpperCaseCharacterRegex.matches(password),
-        containsOneNumberRegex.matches(password),
-        containsOneSpecialCharacterRegex.matches(password),
-        containsEightOrMoreCharactersRegex.matches(password),
-    )
 }
 
 @Preview(name = "SIGN UP", showBackground = true)
