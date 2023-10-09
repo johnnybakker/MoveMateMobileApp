@@ -36,9 +36,10 @@ fun IconButton(
     type: IconButtonType = IconButtonType.IconRightTextLeft,
     color: Color = MaterialTheme.colorScheme.background,
     size: TextUnit = 20.sp,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit)
 {
-    Button(onClick = onClick) {
+    Button(onClick = onClick, modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy((size.value*.5).dp),
             verticalAlignment = Alignment.CenterVertically,

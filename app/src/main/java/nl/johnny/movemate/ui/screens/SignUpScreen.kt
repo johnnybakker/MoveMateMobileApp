@@ -35,12 +35,12 @@ import nl.johnny.movemate.utils.StrongPasswordValidator
 
 
 object SignUpScreenTestTags {
-    val UsernameInput = "UsernameInput"
-    val EmailInput = "EmailInput"
-    val PasswordInput = "PasswordInput"
-    val PasswordIndicator = "PasswordIndicator"
-    val RepeatPasswordInput = "RepeatPasswordInput"
-    val SignUpButton = "SignUpButton"
+    const val UsernameInput = "UsernameInput"
+    const val EmailInput = "EmailInput"
+    const val PasswordInput = "PasswordInput"
+    const val PasswordIndicator = "PasswordIndicator"
+    const val RepeatPasswordInput = "RepeatPasswordInput"
+    const val SignUpButton = "SignUpButton"
 }
 
 @Composable

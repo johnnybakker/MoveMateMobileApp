@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +24,12 @@ import nl.johnny.movemate.ui.models.LoginViewModel
 import nl.johnny.movemate.ui.theme.MoveMateTheme
 import nl.johnny.movemate.ui.theme.MoveMateTheme.alertText
 
+object LoginScreenTestTags {
+    const val EmailInput = "EmailInput"
+    const val PasswordInput = "PasswordInput"
+    const val LoginButton = "LoginButton"
+}
+
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSignUp: () -> Unit) {
     Column(
@@ -36,14 +43,16 @@ fun LoginScreen(viewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSign
         TextField(
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
-            placeholder = "Email"
+            placeholder = "Email",
+            modifier = Modifier.testTag(LoginScreenTestTags.EmailInput)
         )
         Spacer(modifier = Modifier.height(5.dp))
         TextField(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
             placeholder = "Password",
-            secret = true
+            secret = true,
+            modifier = Modifier.testTag(LoginScreenTestTags.PasswordInput)
         )
         Spacer(modifier = Modifier.height(5.dp))
 
@@ -51,7 +60,7 @@ fun LoginScreen(viewModel: LoginViewModel, onClickLogIn: () -> Unit, onClickSign
             text = "Log in",
             onClick = onClickLogIn,
             style = ButtonStyle.Primary,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag(LoginScreenTestTags.LoginButton),
         )
 
         TextDivider(

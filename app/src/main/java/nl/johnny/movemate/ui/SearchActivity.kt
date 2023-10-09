@@ -2,20 +2,13 @@ package nl.johnny.movemate.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import nl.johnny.movemate.api.models.User
-import nl.johnny.movemate.repositories.IUserRepository
-import nl.johnny.movemate.ui.models.SignUpViewModel
 import nl.johnny.movemate.ui.screens.SearchScreen
 import nl.johnny.movemate.ui.screens.UserSearchItem
 import nl.johnny.movemate.ui.theme.MoveMateTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember

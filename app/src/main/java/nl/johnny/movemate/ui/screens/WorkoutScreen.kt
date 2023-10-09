@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -23,8 +24,18 @@ import nl.johnny.movemate.R
 import nl.johnny.movemate.ui.components.IconButton
 import nl.johnny.movemate.ui.theme.MoveMateTheme
 
+object WorkoutScreenTestTags {
+
+    const val DistanceText = "DistanceText"
+    const val TimeText = "TimeText"
+    const val SpeedText = "SpeedText"
+    const val StartButton = "StartWorkoutButton"
+    const val StopButton = "StopWorkoutButton"
+
+}
+
 @Composable
-fun WorkoutDataRow(iconId: Int, text: String) {
+fun WorkoutDataRow(iconId: Int, text: String, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(15.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -41,6 +52,7 @@ fun WorkoutDataRow(iconId: Int, text: String) {
             text = text,
             color = colorScheme.tertiary,
             fontSize = 20.sp,
+            modifier = modifier
         )
     }
 }
@@ -53,16 +65,17 @@ fun WorkoutScreen(time: String, distance: String, speed: String,  started: Boole
     ) {
         Text("WORKOUT", fontSize = 32.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(5.dp))
-        WorkoutDataRow(R.drawable.stopwatch_solid, time)
-        WorkoutDataRow(R.drawable.person_running_solid, distance)
-        WorkoutDataRow(R.mipmap.logo_no_spacing_foreground, speed)
+        WorkoutDataRow(R.drawable.stopwatch_solid, time, Modifier.testTag(WorkoutScreenTestTags.TimeText))
+        WorkoutDataRow(R.drawable.person_running_solid, distance, Modifier.testTag(WorkoutScreenTestTags.DistanceText))
+        WorkoutDataRow(R.mipmap.logo_no_spacing_foreground, speed, Modifier.testTag(WorkoutScreenTestTags.SpeedText))
         Spacer(Modifier.height(20.dp))
         when(started) {
             true -> IconButton (
                 icon = R.drawable.square_solid,
                 text = "STOP WORKOUT",
                 color = colorScheme.tertiary,
-                size = 28.sp
+                size = 28.sp,
+                modifier = Modifier.testTag(WorkoutScreenTestTags.StopButton)
             ) {
                 toggle()
             }
@@ -70,7 +83,8 @@ fun WorkoutScreen(time: String, distance: String, speed: String,  started: Boole
                 icon = R.drawable.play_solid,
                 text = "START WORKOUT",
                 color = colorScheme.tertiary,
-                size = 28.sp
+                size = 28.sp,
+                modifier = Modifier.testTag(WorkoutScreenTestTags.StartButton)
             ) {
                 toggle()
             }
