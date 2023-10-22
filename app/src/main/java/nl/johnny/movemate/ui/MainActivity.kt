@@ -109,10 +109,10 @@ class MainActivity : MoveMateActivity(), ServiceConnection {
                     )
 
                     val time = (trackingData?.time ?: 0L) / 1000
-                    val distance = trackingData?.km ?: 0.0
-                    val speed = if(time > 1) { floor((distance / time) * 3.6 * 10) / 10 } else { 0.0 }
+                    val distance = floor((trackingData?.km ?: 0.0) * 100) / 100
+                    val speed = trackingData?.kmPerHour ?: 0.0
 
-                    WorkoutScreen(time = TimeUtil.secondsToTimeString(time), distance = "${floor(distance * 10) / 10} KM", "$speed KM/H", started = trackingData != null) {
+                    WorkoutScreen(time = TimeUtil.secondsToTimeString(time), distance = "$distance KM", "$speed KM/H", started = trackingData != null) {
 
                         if (trackingData != null) {
 

@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import nl.johnny.movemate.api.models.Workout
 import java.util.concurrent.TimeUnit
+import kotlin.math.floor
 
 class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {
 
@@ -27,23 +28,30 @@ class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {
 
     private val locations = mutableListOf<Location>()
 
-    var kmPerHour = 0.0
-        private set
-
     var km = 0.0
         private set
 
     var time = 0L
         private set
 
-    private var validPositionTime = 0L
+    private var lastValidTime = 0L
 
+    val kmPerHour: Double
+        get() {
+            return if (lastValidTime > 0 && km > 0.01) {
+                floor((km * 1000) / (lastValidTime / 1000) * 3.6 * 10) / 10
+            } else {
+                0.0
+            }
+        }
+
+    private var startTime = 0L
 
 
     override fun onLocationResult(result: LocationResult) {
 
         workout.value?.let {
-            time = System.currentTimeMillis() - it.startdate.time
+            time = System.currentTimeMillis() - startTime
         }
 
         result.lastLocation?.let {
@@ -53,24 +61,17 @@ class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {
                 return workout.postValue(workout.value)
             }
 
-            var distance = locations[locations.size - 1].distanceTo(it)
+            val distance = locations[locations.size - 1].distanceTo(it)
 
-            val delta = if (distance < 5) {
-                distance = if(locations.size <= 1) {
-                    0F
-                } else {
-                    locations[locations.size - 2].distanceTo(locations[locations.size - 1])
-                }
-                (time - validPositionTime) / 1000.0
-            } else {
-                val delta = (time - validPositionTime) / 1000.0
-                validPositionTime = time
-                locations.add(it)
-                delta
+            if (distance < 5) {
+                workout.postValue(workout.value)
+                return
             }
 
-            val meterPerSecond = distance / delta / 1000
-            kmPerHour = meterPerSecond * 3.6
+            lastValidTime = time
+
+            locations.add(it)
+
             km += distance / 1000.0
         }
 
@@ -85,7 +86,7 @@ class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {
         workout.removeObserver(observer)
     }
 
-    private val locationRequest = LocationRequest.Builder(TimeUnit.SECONDS.toMillis(1))
+    private val locationRequest = LocationRequest.Builder(TimeUnit.MILLISECONDS.toMillis(500))
         .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
         .build()
 
@@ -101,6 +102,7 @@ class WorkoutTracker(context: Context, app: MoveMateApp) : LocationCallback() {
 
         app.workoutRepository.create("RUNNING") {
             workout.value = it
+            startTime = System.currentTimeMillis()
 
             if (accessFineLocation || accessCoarseLocation )
                 locationProvider.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
